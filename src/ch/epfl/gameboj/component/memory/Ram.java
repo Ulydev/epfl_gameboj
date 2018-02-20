@@ -1,11 +1,14 @@
 package ch.epfl.gameboj.component.memory;
 
-public class Ram {
+import ch.epfl.gameboj.Preconditions;
+import ch.epfl.gameboj.component.Component;
+
+public class Ram implements Component {
 
     private byte[] data;
 
     public Ram(int size) {
-        //TODO: IllegalArgumentException if size < 0
+        Preconditions.checkArgument(size >= 0);
         this.data = new byte[size];
     }
 
@@ -13,14 +16,15 @@ public class Ram {
         return this.data.length;
     }
 
+    @Override
     public int read(int index) {
-        //TODO: check IndexOutOfBoundsException
         byte v = this.data[index];
         return Byte.toUnsignedInt(v);
     }
 
+    @Override
     public void write(int index, int value) {
-        //TODO: check IndexOutOfBoundsException, IllegalArgumentException if value isn't 8 bits
+        Preconditions.checkBits8(value);
         this.data[index] = (byte)value;
     }
 
