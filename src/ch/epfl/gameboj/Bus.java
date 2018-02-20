@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public final class Bus {
 
-    ArrayList<Component> attachedComponents = new ArrayList<>();
+    private ArrayList<Component> attachedComponents = new ArrayList<>();
 
     public void attach(Component component) {
         Objects.requireNonNull(component);
