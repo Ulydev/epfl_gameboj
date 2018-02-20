@@ -5,7 +5,7 @@ import ch.epfl.gameboj.component.Component;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Bus {
+public final class Bus {
 
     ArrayList<Component> attachedComponents = new ArrayList<>();
 
@@ -15,7 +15,7 @@ public class Bus {
     }
 
     public int read(int address) {
-        //TODO: IllegalArgumentException if address isn't 16 bits
+        Preconditions.checkBits16(address);
         for (Component component : attachedComponents) {
             int value = component.read(address);
             if (value != Component.NO_DATA)
@@ -25,7 +25,8 @@ public class Bus {
     }
 
     public void write(int address, int data) {
-        //TODO: IllegalArgumentException if address isn't 16 bits, or data isn't 8 bits
+        Preconditions.checkBits16(address);
+        Preconditions.checkBits8(data);
         for (Component component : attachedComponents) {
             component.write(address, data);
         }
