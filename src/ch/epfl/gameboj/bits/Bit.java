@@ -9,7 +9,7 @@ public interface Bit {
     }
 
     default int mask() {
-
+        return Bits.mask(index());
     }
 
 }
