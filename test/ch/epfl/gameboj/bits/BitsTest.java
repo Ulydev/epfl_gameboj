@@ -217,6 +217,12 @@ class BitsTest {
     }
 
     @Test
+    void rotateFailsForInvalidBits() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Bits.rotate(3, 0b1010, 1));
+    }
+
+    @Test
     void rotateWorksOnFullInt() {
         Random rng = newRandom();
         for (int i = 0; i < RANDOM_ITERATIONS; ++i) {
