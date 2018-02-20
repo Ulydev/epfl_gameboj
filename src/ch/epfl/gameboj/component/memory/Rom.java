@@ -1,12 +1,16 @@
 package ch.epfl.gameboj.component.memory;
 
-import java.util.Arrays;
+import ch.epfl.gameboj.component.Component;
 
-public class Rom {
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Rom implements Component {
 
     private byte[] data;
 
     public Rom(byte[] data) {
+        Objects.requireNonNull(data);
         this.data = Arrays.copyOf(data, data.length);
     }
 
@@ -14,10 +18,13 @@ public class Rom {
         return this.data.length;
     }
 
+    @Override
     public int read(int index) {
-        //TODO: check IndexOutOfBoundsException
         byte v = this.data[index];
         return Byte.toUnsignedInt(v);
     }
+
+    @Override
+    public void write(int index, int value) {}
 
 }
