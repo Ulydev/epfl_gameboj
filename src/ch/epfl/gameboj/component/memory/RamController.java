@@ -5,14 +5,34 @@ import ch.epfl.gameboj.component.Component;
 
 import java.util.Objects;
 
+/**
+ * RamController
+ * A Component that controls access to a ram
+ *
+ * @author Ulysse Ramage (282300)
+ */
 public class RamController implements Component {
 
+    /** The ram associated to the controller */
     Ram ram;
 
-    // [startAddress, endAddress[
+    /**
+     * The data of the ram is accessible between startAddress (included)
+     * and endAddress (excluded)
+     */
     int startAddress;
     int endAddress;
 
+    /**
+     * Creates a new RamController with the given ram and address range
+     * @param ram the Ram instance to control
+     * @param startAddress the start address of the controller
+     * @param endAddress the end address of the controller
+     * @throws IllegalArgumentException if either {@code startAddress} or
+     * {@code endAddress} isn't 16-bit, or if the address range is negative or
+     * greater than the size of {@code ram} itself
+     * @throws NullPointerException if {@code ram} is null
+     */
     public RamController(Ram ram, int startAddress, int endAddress) {
         Objects.requireNonNull(ram);
         Preconditions.checkBits16(startAddress);
@@ -26,14 +46,27 @@ public class RamController implements Component {
         this.startAddress = startAddress;
         this.endAddress = endAddress;
     }
+
+    /**
+     * endAddress is calculated such that the entire ram is accessible
+     * @see #RamController(Ram, int, int)
+     */
     public RamController(Ram ram, int startAddress) {
         this(ram, startAddress, startAddress + ram.size());
     }
 
+    /**
+     * Checks if the given address is within the controller's bounds
+     * @param address the address to check
+     * @return true if {@code address} is within the bounds, else false
+     */
     private boolean isWithinBounds(int address) {
         return (startAddress <= address && address < endAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(int address) {
         Preconditions.checkBits16(address);
@@ -44,11 +77,16 @@ public class RamController implements Component {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(int address, int data) {
         Preconditions.checkBits16(address);
-        if (isWithinBounds(address))
+        Preconditions.checkBits8(data);
+        if (isWithinBounds(address)) {
             ram.write(address - startAddress, data);
+        }
     }
 
 }
