@@ -91,7 +91,7 @@ public final class Bits {
      * positive, to the right if it is negative
      * @return a value obtained by rotating the bits of {@code bits}
      * @throws IllegalArgumentException if {@code size} isn't between
-     * 0 (excluded) and 32 (included), or if {@bits} isn't a {@code size}-bit
+     * 0 (excluded) and 32 (included), or if {@code bits} isn't a {@code size}-bit
      * value
      */
     public static int rotate(int size, int bits, int distance) {
@@ -122,8 +122,8 @@ public final class Bits {
     public static int reverse8(int b) {
         Preconditions.checkBits8(b);
         int result = 0;
-        for (int i = 0; i < 0b1000; ++i) {
-            result = result | (extract(b, 0b1000 - i - 1, 1) << i);
+        for (int i = 0; i < 8; ++i) {
+            result = result | (extract(b, 8 - i - 1, 1) << i);
         }
         return result;
     }
@@ -135,7 +135,7 @@ public final class Bits {
      */
     public static int complement8(int b) {
         Preconditions.checkBits8(b);
-        return extract(~b, 0, 0b1000);
+        return extract(~b, 0, 8);
     }
 
     /**
@@ -149,7 +149,7 @@ public final class Bits {
     public static int make16(int highB, int lowB) {
         Preconditions.checkBits8(highB);
         Preconditions.checkBits8(lowB);
-        return (highB << 0b1000) | lowB;
+        return (highB << 8) | lowB;
     }
 
 }
