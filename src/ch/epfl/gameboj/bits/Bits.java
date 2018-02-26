@@ -16,9 +16,10 @@ public final class Bits {
     private Bits() {}
 
     /**
+     * Creates the bit mask of a given index
      * @param index the index of the mask
-     * @return a value in which only the bit of given index is 0
-     * @throws IndexOutOfBoundsException if the index is invalid
+     * @return a value in which only the bit of index {@code index} is 1
+     * @throws IndexOutOfBoundsException if {@code index} is invalid
      */
     public static int mask(int index) {
         Objects.checkIndex(index, Integer.SIZE);
@@ -26,9 +27,10 @@ public final class Bits {
     }
 
     /**
+     * Tests the bit of a value at a given index
      * @param bits the value to check
      * @param index the index to check
-     * @return true if and only if the bit at the given index of bits is 1
+     * @return true if and only if the bit of index {@code index} of {@code bits} is 1
      * @throws IndexOutOfBoundsException if the index is invalid
      */
     public static boolean test(int bits, int index) {
@@ -44,11 +46,13 @@ public final class Bits {
     }
 
     /**
+     * Sets the i-th bit of a value
      * @param bits the value to modify
      * @param index the index to write to
      * @param newValue the new bit value
-     * @return a value equal to bits, except the bit of given index is newValue
-     * @throws IndexOutOfBoundsException if the index is invalid
+     * @return a value equal to bits, except the bit of index {@code index}
+     * is {@code newValue}
+     * @throws IndexOutOfBoundsException if {@code index} is invalid
      */
     public static int set(int bits, int index, boolean newValue) {
         if (newValue) {
@@ -59,11 +63,13 @@ public final class Bits {
     }
 
     /**
-     * @param size the size of the new value
+     * Clips a value to a provided size
+     * @param size the size of the new value, in bits
      * @param bits the value to modify
-     * @return a value equal to bits, except all bits of index >= size are 0
-     * @throws IllegalArgumentException if size isn't between 0 (included)
-     * and 32 (included)
+     * @return a value equal to {@code bits}, except all bits of
+     * index >= {@code size} are 0
+     * @throws IllegalArgumentException if {@code size} isn't between
+     * 0 (included) and 32 (included)
      */
     public static int clip(int size, int bits) {
         Preconditions.checkArgument(0 <= size && size <= Integer.SIZE);
@@ -71,13 +77,14 @@ public final class Bits {
     }
 
     /**
+     * Extracts the bits from a provided value
      * @param bits the value to modify
      * @param start the start index
      * @param size the size of the new value
-     * @return a value obtained by extracting the bits from the start index to
-     * the (start + size) index
-     * @throws IndexOutOfBoundsException if the range [start, start+size] isn't
-     * valid
+     * @return a value obtained by extracting the bits of {@code bits} from
+     * index {@code start} to index ({@code start+size})
+     * @throws IndexOutOfBoundsException if the range
+     * [{@code start}, {@code start+size}] isn't valid
      */
     public static int extract(int bits, int start, int size) {
         Objects.checkFromIndexSize(start, size, Integer.SIZE);
@@ -85,14 +92,15 @@ public final class Bits {
     }
 
     /**
+     * Rotates the bits of a given value
      * @param size the size of the desired value
      * @param bits the value to modify
      * @param distance the distance offset to rotate; to the left if it is
      * positive, to the right if it is negative
      * @return a value obtained by rotating the bits of {@code bits}
      * @throws IllegalArgumentException if {@code size} isn't between
-     * 0 (excluded) and 32 (included), or if {@code bits} isn't a {@code size}-bit
-     * value
+     * 0 (excluded) and 32 (included), or if {@code bits} isn't a
+     * {@code size}-bit value
      */
     public static int rotate(int size, int bits, int distance) {
         Preconditions.checkArgument(0 < size && size <= Integer.SIZE);
@@ -105,6 +113,7 @@ public final class Bits {
     }
 
     /**
+     * Extends the sign of an 8-bit value
      * @param b the value to modify
      * @return a value obtained by extending the sign of {@code b}
      * @throws IllegalArgumentException if {@code b} isn't 8-bit
@@ -115,6 +124,7 @@ public final class Bits {
     }
 
     /**
+     * Reverse the bits of an 8-bit value
      * @param b the value to modify
      * @return a value obtained by mirroring the i and 7-i bits of {@code b}
      * @throws IllegalArgumentException if {@code b} isn't 8-bit
@@ -129,6 +139,7 @@ public final class Bits {
     }
 
     /**
+     * Returns the complement of an 8-bit value
      * @param b the value to modify
      * @return a value obtained by flipping the 8 bits of {@code b}
      * @throws IllegalArgumentException if {@code b} isn't 8-bit
@@ -139,6 +150,7 @@ public final class Bits {
     }
 
     /**
+     * Makes a 16-bit value from two 8-bit values
      * @param highB the left-hand value of the result
      * @param lowB the right-hand value of the result
      * @return a 16-bit integer obtained by combining {@code highB} on the left
