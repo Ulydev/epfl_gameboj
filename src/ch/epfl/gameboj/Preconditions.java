@@ -12,7 +12,7 @@ public interface Preconditions {
     /**
      * Checks if a condition is satisfied
      * @param b the condition to check
-     * @throws IllegalArgumentException if the {@code condition} is not satisfied
+     * @throws IllegalArgumentException if {@code condition} is not satisfied
      */
     static void checkArgument(boolean b) {
         if (!b)
