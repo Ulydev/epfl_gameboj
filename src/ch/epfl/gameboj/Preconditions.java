@@ -2,7 +2,8 @@ package ch.epfl.gameboj;
 
 /**
  * Preconditions
- * Interface containing static methods that can be used to check
+ *
+ * An interface containing static methods that can be used to check
  * the validity of various arguments
  *
  * @author Ulysse Ramage (282300)

@@ -8,6 +8,7 @@ import java.util.Objects;
 
 /**
  * Alu
+ *
  * A class containing static methods to execute various
  * arithmetic and logic operations
  *
