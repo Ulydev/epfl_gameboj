@@ -87,7 +87,7 @@ public final class Alu {
     /**
      * Checks if a packed value is correctly formatted
      * @param valueFlags the packed value to check
-     * @throws IllegalArgumentException if the packed value is invalid
+     * @throws IllegalArgumentException if {@code valueFlags} is invalid
      * (one of the first 4 bits is 1)
      */
     private static void checkPackedValue(int valueFlags) {
@@ -103,6 +103,7 @@ public final class Alu {
      * Extracts the 16-bit value of a given packed integer
      * @param valueFlags the packed integer
      * @return the extracted value
+     * @throws IllegalArgumentException if {@code valueFlags} is invalid
      * @see #packValueZNHC(int, boolean, boolean, boolean, boolean)
      */
     public static int unpackValue(int valueFlags) {
@@ -114,6 +115,7 @@ public final class Alu {
      * Extracts the flags of a given packed integer
      * @param valueFlags the packed integer
      * @return the extracted flags
+     * @throws IllegalArgumentException if {@code valueFlags} is invalid
      * @see #packValueZNHC(int, boolean, boolean, boolean, boolean)
      */
     public static int unpackFlags(int valueFlags) {
@@ -128,7 +130,8 @@ public final class Alu {
      * @param c0 the initial carry, true if 1 and false if 0
      * @return a packed integer containing the result and the flags
      * of the operation
-     * @throws IllegalArgumentException if either {@code l} or {@code r} isn't 8-bit
+     * @throws IllegalArgumentException if either {@code l}
+     * or {@code r} isn't 8-bit
      */
     public static int add(int l, int r, boolean c0) {
         Preconditions.checkBits8(l);
@@ -165,8 +168,9 @@ public final class Alu {
         if (high) {
             int highL = Bits.extract(l, 8, 8);
             int highR = Bits.extract(r, 8, 8);
-            h = getAddH(highL, highR, false);
-            c = getAddC(highL, highR, false);
+            boolean c0 = getAddC(l, r, false);
+            h = getAddH(highL, highR, c0);
+            c = getAddC(highL, highR, c0);
         } else {
             int lowL = Bits.clip(8, l);
             int lowR = Bits.clip(8, r);
@@ -230,10 +234,11 @@ public final class Alu {
      */
     public static int bcdAdjust(int v, boolean n, boolean h, boolean c) {
         Preconditions.checkBits8(v);
-        boolean fixL = h || (!n && Bits.clip(4, v) >= 10);
+        boolean fixL = h || (!n && Bits.clip(4, v) > 9);
         boolean fixH = c || (!n && v > 0x99);
         int fix = 0x60 * (fixH ? 1 : 0) + 0x06 * (fixL ? 1 : 0);
         int result = n ? (v - fix) : (v + fix);
+        result = Bits.clip(8, result);
         boolean z = (result == 0);
         return packValueZNHC(result, z, n, false, fixH);
     }
@@ -382,14 +387,14 @@ public final class Alu {
      * @param v the value to test
      * @param bitIndex the index of the bit to test
      * @return a packed integer containing 0 and the flags Z010, where Z is 1
-     * if and only if the tested bit is 1
+     * if and only if the tested bit is 0
      * @throws IllegalArgumentException if {@code v} isn't 8-bit
      * @throws IndexOutOfBoundsException if {@code bitIndex} isn't between 0 and 7
      */
     public static int testBit(int v, int bitIndex) {
         Preconditions.checkBits8(v);
         Objects.checkIndex(bitIndex, 8);
-        boolean z = Bits.test(v, bitIndex);
+        boolean z = !Bits.test(v, bitIndex);
         return packValueZNHC(0, z, false, true, false);
     }
 
