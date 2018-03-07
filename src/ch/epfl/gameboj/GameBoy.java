@@ -5,6 +5,7 @@ import ch.epfl.gameboj.component.memory.RamController;
 
 /**
  * GameBoy
+ *
  * A class representing a GameBoy and its components
  *
  * @author Ulysse Ramage (282300)

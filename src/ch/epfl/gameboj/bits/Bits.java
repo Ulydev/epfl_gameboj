@@ -8,6 +8,7 @@ import java.util.Objects;
  * Bits
  *
  * A class containing static methods to manipulate bits
+ *
  * @author Ulysse Ramage (282300)
  */
 public final class Bits {

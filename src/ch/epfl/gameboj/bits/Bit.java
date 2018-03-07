@@ -2,6 +2,7 @@ package ch.epfl.gameboj.bits;
 
 /**
  * Bit
+ *
  * An interface that represents a bit
  *
  * @author Ulysse Ramage (282300)

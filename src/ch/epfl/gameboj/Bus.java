@@ -7,6 +7,7 @@ import java.util.Objects;
 
 /**
  * Bus
+ *
  * A class representing a Bus that can be used to connect components together
  *
  * @author Ulysse Ramage (282300)

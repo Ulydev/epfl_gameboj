@@ -4,6 +4,7 @@ import ch.epfl.gameboj.Bus;
 
 /**
  * Component
+ *
  * An interface that represents an electronic component
  *
  * @author Ulysse Ramage (282300)
