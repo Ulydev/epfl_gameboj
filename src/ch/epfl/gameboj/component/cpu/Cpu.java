@@ -1,6 +1,7 @@
 package ch.epfl.gameboj.component.cpu;
 
 import ch.epfl.gameboj.*;
+import ch.epfl.gameboj.bits.Bit;
 import ch.epfl.gameboj.bits.Bits;
 import ch.epfl.gameboj.component.Clocked;
 import ch.epfl.gameboj.component.Component;
@@ -44,6 +45,11 @@ public final class Cpu implements Component, Clocked {
     /** Special registers */
     private int PC, SP;
 
+    /** Interrupts */
+    public enum Interrupt implements Bit {
+        VBLANK, LCD_STAT, TIMER, SERIAL, JOYPAD
+    }
+
     /** Flags source */
     private enum FlagSrc {
         V0, V1, ALU, CPU
@@ -51,8 +57,7 @@ public final class Cpu implements Component, Clocked {
 
     @Override
     public int read(int address) {
-        // TODO:
-        return NO_DATA;
+        return Component.NO_DATA;
     }
 
     @Override
@@ -348,7 +353,7 @@ public final class Cpu implements Component, Clocked {
             } break;
             case INC_HLR: {
                 int result = Alu.add(read8AtHl(), 1);
-                write8AtHl(result);
+                write8AtHl(Alu.unpackValue(result));
                 combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.CPU);
             } break;
             case INC_R16SP: {
@@ -363,9 +368,9 @@ public final class Cpu implements Component, Clocked {
                 combineAluFlags(result, FlagSrc.CPU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.ALU);
             } break;
             case LD_HLSP_S8: {
-                int value = Bits.signExtend8(read8AfterOpcode());
+                int value = Bits.clip(16, Bits.signExtend8(read8AfterOpcode()));
                 boolean editHL = Bits.test(opcode.encoding, 4);
-                int result = Alu.add(SP, value);
+                int result = Alu.add16L(SP, value);
                 if (editHL) {
                     setReg16(Reg16.HL, Alu.unpackValue(result));
                 } else {
@@ -402,7 +407,7 @@ public final class Cpu implements Component, Clocked {
             } break;
             case DEC_HLR: {
                 int result = Alu.sub(read8AtHl(), 1);
-                write8AtHl(result);
+                write8AtHl(Alu.unpackValue(result));
                 combineAluFlags(result, FlagSrc.ALU, FlagSrc.V1, FlagSrc.ALU, FlagSrc.CPU);
             } break;
             case CP_A_N8: {
@@ -459,18 +464,18 @@ public final class Cpu implements Component, Clocked {
             case XOR_A_N8: {
                 int result = Alu.xor(reg(Reg.A), read8AfterOpcode());
                 setRegFromAlu(Reg.A, result);
-                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.V0);
+                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0);
             } break;
             case XOR_A_R8: {
                 Reg opcodeReg = extractReg(opcode, 0);
                 int result = Alu.xor(reg(Reg.A), reg(opcodeReg));
                 setRegFromAlu(Reg.A, result);
-                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.V0);
+                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0);
             } break;
             case XOR_A_HLR: {
                 int result = Alu.xor(reg(Reg.A), read8AtHl());
                 setRegFromAlu(Reg.A, result);
-                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.V0);
+                combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0);
             } break;
             case CPL: {
                 setReg(Reg.A, Bits.complement8(reg(Reg.A)));
@@ -524,7 +529,7 @@ public final class Cpu implements Component, Clocked {
             } break;
             case SWAP_HLR: {
                 int result = Alu.swap(read8AtHl());
-                setReg16(Reg16.HL, Alu.unpackValue(result));
+                write8AtHl(Alu.unpackValue(result));
                 combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0);
             } break;
             case SLA_R8: {
@@ -564,21 +569,21 @@ public final class Cpu implements Component, Clocked {
             // Bit test and set
             case BIT_U3_R8: {
                 Reg opcodeReg = extractReg(opcode, 0);
-                int result = Alu.testBit(reg(opcodeReg), extractTestBitIndex(opcode));
+                int result = Alu.testBit(reg(opcodeReg), extractBitIndex(opcode));
                 combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.CPU);
             } break;
             case BIT_U3_HLR: {
-                int result = Alu.testBit(read8AtHl(), extractTestBitIndex(opcode));
+                int result = Alu.testBit(read8AtHl(), extractBitIndex(opcode));
                 combineAluFlags(result, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.CPU);
             } break;
             case CHG_U3_R8: {
                 Reg opcodeReg = extractReg(opcode, 0);
-                int result = Bits.set(reg(opcodeReg), extractTestBitIndex(opcode), extractBitValue(opcode));
-                setRegFromAlu(opcodeReg, result);
+                int result = Bits.set(reg(opcodeReg), extractBitIndex(opcode), extractBitValue(opcode));
+                setReg(opcodeReg, result);
             } break;
             case CHG_U3_HLR: {
-                int result = Bits.set(read8AtHl(), extractTestBitIndex(opcode), extractBitValue(opcode));
-                write8AtHl(Alu.unpackValue(result));
+                int result = Bits.set(read8AtHl(), extractBitIndex(opcode), extractBitValue(opcode));
+                write8AtHl(result);
             } break;
 
             // Misc. ALU
@@ -593,6 +598,8 @@ public final class Cpu implements Component, Clocked {
                 boolean carry = !complement || !getC();
                 combineAluFlags(0, FlagSrc.CPU, FlagSrc.V0, FlagSrc.V0, carry ? FlagSrc.V1 : FlagSrc.V0);
             } break;
+
+
 
         }
     }
@@ -865,7 +872,7 @@ public final class Cpu implements Component, Clocked {
      * @param opcode the opcode to extract from
      * @return the index of the bit, contained in bits 3 to 5
      */
-    private int extractTestBitIndex(Opcode opcode) {
+    private int extractBitIndex(Opcode opcode) {
         return Bits.extract(opcode.encoding, 3, 3);
     }
 
@@ -904,5 +911,15 @@ public final class Cpu implements Component, Clocked {
     private boolean extractCarry(Opcode opcode) {
         return Bits.test(opcode.encoding, 3);
     }
+
+    /**
+     * Raises an interrupt (sets the corresponding bit to 1 in register IF)
+     * @param i the interrupt to raise
+     */
+    public void requestInterrupt(Interrupt i) {
+        // set the corresponding bit to 1 in register F i.index();
+    }
+
+
 
 }
