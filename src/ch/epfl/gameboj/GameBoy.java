@@ -33,7 +33,7 @@ public class GameBoy {
      * @param cartridge the cartridge to read
      */
     public GameBoy(Cartridge cartridge) {
-        //Objects.requireNonNull(cartridge);
+        Objects.requireNonNull(cartridge);
 
         bus = new Bus();
 
@@ -56,8 +56,8 @@ public class GameBoy {
         cpu.attachTo(bus);
 
         // BootRomController
-        //BootRomController brm = new BootRomController(cartridge);
-        //brm.attachTo(bus);
+        BootRomController brm = new BootRomController(cartridge);
+        brm.attachTo(bus);
 
         // Timer
         timer = new Timer(cpu);
