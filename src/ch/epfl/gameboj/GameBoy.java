@@ -1,7 +1,13 @@
 package ch.epfl.gameboj;
 
+import ch.epfl.gameboj.component.Timer;
+import ch.epfl.gameboj.component.cartridge.Cartridge;
+import ch.epfl.gameboj.component.cpu.Cpu;
+import ch.epfl.gameboj.component.memory.BootRomController;
 import ch.epfl.gameboj.component.memory.Ram;
 import ch.epfl.gameboj.component.memory.RamController;
+
+import java.util.Objects;
 
 /**
  * GameBoy
@@ -13,25 +19,49 @@ import ch.epfl.gameboj.component.memory.RamController;
 public class GameBoy {
 
     /** Bus to connect all components */
-    Bus bus;
+    private Bus bus;
+
+    /** Processing unit */
+    private Cpu cpu;
+    private long simulatedCycles;
+
+    /** Timer */
+    private Timer timer;
 
     /**
      * Creates a new GameBoy from the given cartridge
      * @param cartridge the cartridge to read
      */
-    public GameBoy(Object cartridge) {
+    public GameBoy(Cartridge cartridge) {
+        //Objects.requireNonNull(cartridge);
+
         bus = new Bus();
 
+        // Ram
         Ram ram = new Ram(AddressMap.WORK_RAM_SIZE);
-        bus.attach(new RamController(
+        RamController ramController = new RamController(
                 ram,
                 AddressMap.WORK_RAM_START
-        ));
-        bus.attach(new RamController(
+        );
+        RamController echoRamController = new RamController(
                 ram,
                 AddressMap.ECHO_RAM_START,
                 AddressMap.ECHO_RAM_END
-        ));
+        );
+        ramController.attachTo(bus);
+        echoRamController.attachTo(bus);
+
+        // Cpu
+        cpu = new Cpu();
+        cpu.attachTo(bus);
+
+        // BootRomController
+        //BootRomController brm = new BootRomController(cartridge);
+        //brm.attachTo(bus);
+
+        // Timer
+        timer = new Timer(cpu);
+        timer.attachTo(bus);
     }
 
     /**
@@ -39,6 +69,40 @@ public class GameBoy {
      */
     public Bus bus() {
         return bus;
+    }
+
+    /**
+     * @return the GameBoy cpu
+     */
+    public Cpu cpu() {
+        return cpu;
+    }
+
+    /**
+     * @return the GameBoy timer
+     */
+    public Timer timer() {
+        return timer;
+    }
+
+    /**
+     * Runs the processor until a given cycle is reached
+     * @param cycle the cycle limit
+     */
+    public void runUntil(long cycle) {
+        Preconditions.checkArgument(simulatedCycles <= cycle);
+        while (simulatedCycles < cycle) {
+            timer.cycle(simulatedCycles);
+            cpu.cycle(simulatedCycles);
+            simulatedCycles++;
+        }
+    }
+
+    /**
+     * @return the number of cycles already simulated
+     */
+    public long cycles() {
+        return simulatedCycles;
     }
 
 }
