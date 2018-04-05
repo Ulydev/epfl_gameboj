@@ -1,4 +1,4 @@
-package ch.epfl.gameboj.component.cpu.cpu2;
+package ch.epfl.gameboj.component.cpu;
 
 import ch.epfl.gameboj.Bus;
 import ch.epfl.gameboj.Register;
