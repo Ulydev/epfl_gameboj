@@ -23,7 +23,7 @@ public class CpuTest {
         return programBytes;
     }
 
-    private void assertProgramOutput(String program, int[] expectedOutput) {
+    private void assertProgramOutput(String program, int[] expectedOutput, int pc) {
         Cpu cpu = new Cpu();
         Ram ram = new Ram(AddressMap.WORK_RAM_SIZE);
         Bus bus = connect(cpu, ram);
@@ -33,12 +33,16 @@ public class CpuTest {
             bus.write(i, programBytes[i]);
         }
 
-        cycleCpuTillPC(cpu, programBytes.length);
+        cycleCpuTillPC(cpu, pc);
 
         int[] output = cpu._testGetPcSpAFBCDEHL();
         for (int i = 0; i < expectedOutput.length; ++i) {
             assertEquals(expectedOutput[i], output[i]);
         }
+    }
+    private void assertProgramOutput(String program, int[] expectedOutput) {
+        int[] programBytes = getProgramFromString(program);
+        assertProgramOutput(program, expectedOutput, programBytes.length);
     }
 
     private Bus connect(Cpu cpu, Ram ram) {
@@ -57,7 +61,7 @@ public class CpuTest {
 
     private void cycleCpuTillPC(Cpu cpu, int PC) {
         int cycle = 0;
-        while (cpu._testGetPcSpAFBCDEHL()[0] < PC) {
+        while (cpu._testGetPcSpAFBCDEHL()[0] != PC) {
             cpu.cycle(cycle++);
         }
     }
@@ -85,7 +89,6 @@ public class CpuTest {
     void cpuExecutesFibonacciCorrectly() {
         assertProgramOutput(String.join(
                 " ",
-                "00",
                 "06 00",
                 "3E 01",
                 "0E 0A",
@@ -96,10 +99,28 @@ public class CpuTest {
                 "C2 06 00",
                 "76"
         ), new int[] {
-                15,
+                14,
                 0,
                 89 // Expected result
         });
+    }
+
+    @Test
+    void cpuExecutesFibonacciCorrectly2() {
+        assertProgramOutput(String.join(
+                " ",
+                "31 FF FF 3E",
+                "0B CD 0A 00",
+                "76 00 FE 02",
+                "D8 C5 3D 47",
+                "CD 0A 00 4F",
+                "78 3D CD 0A",
+                "00 81 C1 C9"
+        ), new int[] {
+                8,
+                65535,
+                89 // Expected result
+        }, 8);
     }
 
     @Test

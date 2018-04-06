@@ -9,11 +9,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ch.epfl.gameboj.DebugMain;
-
 public final class Cartridge implements Component {
 
     Component mbc;
+
+    public static int TYPE_ADDRESS = 0x147;
 
     /**
      * Creates a new Cartridge associated with the given Memory Bank Controller
@@ -34,7 +34,7 @@ public final class Cartridge implements Component {
         try (InputStream stream = new FileInputStream(romFile)) {
             data = stream.readAllBytes();
         }
-        Preconditions.checkArgument(data[0x147] == 0);
+        Preconditions.checkArgument(data[TYPE_ADDRESS] == 0);
         Cartridge cartridge = new Cartridge(new MBC0(new Rom(data)));
         return cartridge;
     }

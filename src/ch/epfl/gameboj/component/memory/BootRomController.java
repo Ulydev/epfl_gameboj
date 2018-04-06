@@ -9,14 +9,17 @@ import java.util.Objects;
 
 public final class BootRomController implements Component {
 
-    Cartridge cartridge;
-    boolean bootRomDisabled = false;
+    private Cartridge cartridge;
+    private boolean bootRomDisabled = false;
 
     public BootRomController(Cartridge cartridge) {
         Objects.requireNonNull(cartridge);
         this.cartridge = cartridge;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(int address) {
         Preconditions.checkBits16(address);
@@ -27,6 +30,9 @@ public final class BootRomController implements Component {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(int address, int data) {
         Preconditions.checkBits16(address);
