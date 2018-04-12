@@ -6,9 +6,16 @@ import ch.epfl.gameboj.component.memory.Rom;
 
 import java.util.Objects;
 
+/**
+ * MBC0
+ *
+ * A class representing an MBC0 rom controller
+ *
+ * @author Ulysse Ramage (282300)
+ */
 public final class MBC0 implements Component {
 
-    Rom rom;
+    private final Rom rom;
 
     /**
      * Creates a new controller of type 0 for the given Rom
@@ -23,6 +30,9 @@ public final class MBC0 implements Component {
         this.rom = rom;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(int address) {
         if (0 <= address && address < rom.size()) {
@@ -32,6 +42,8 @@ public final class MBC0 implements Component {
         }
     }
 
+    /** Does not do anything, as writing to a Rom is not supported */
     @Override
-    public void write(int address, int data) {  }
+    public void write(int address, int data) {}
+
 }

@@ -11,8 +11,7 @@ import ch.epfl.gameboj.Bus;
  */
 public interface Component {
 
-    /** Returned when the address contains no value */
-    int NO_DATA = 0x100;
+    static final int NO_DATA = 0x100;
 
     /**
      * Reads the data of the component at the specified address

@@ -5,14 +5,14 @@ import java.util.Objects;
 
 /**
  * Rom
+ *
  * A class representing a memory that can only be read from
  *
  * @author Ulysse Ramage (282300)
  */
-public class Rom {
+public final class Rom {
 
-    /** Array containing the rom contents */
-    private byte[] data;
+    private final byte[] data;
 
     /**
      * Creates a rom from the specified data
@@ -25,13 +25,6 @@ public class Rom {
     }
 
     /**
-     * @return the size of the rom
-     */
-    public int size() {
-        return this.data.length;
-    }
-
-    /**
      * Reads the value of the rom data at the given index
      * @param index the index to read data at
      * @return an unsigned integer, the value at the {@code index}
@@ -40,6 +33,13 @@ public class Rom {
     public int read(int index) {
         byte v = this.data[index];
         return Byte.toUnsignedInt(v);
+    }
+
+    /**
+     * @return the size of the rom
+     */
+    public int size() {
+        return this.data.length;
     }
 
 }

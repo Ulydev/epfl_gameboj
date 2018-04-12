@@ -7,11 +7,25 @@ import ch.epfl.gameboj.component.cartridge.Cartridge;
 
 import java.util.Objects;
 
+/**
+ * BootRomController
+ *
+ * A class representing a Boot Rom Controller that gives access
+ * to the contents of a cartridge once it has been disabled
+ *
+ * @author Ulysse Ramage (282300)
+ */
 public final class BootRomController implements Component {
 
-    private Cartridge cartridge;
+    private final Cartridge cartridge;
     private boolean bootRomDisabled = false;
 
+    /**
+     * Creates a new BootRomController that gives access
+     * to the contents of a Cartridge
+     * @param cartridge the cartridge to associate the BootRomController with
+     * @throws NullPointerException if {@code cartridge} is null
+     */
     public BootRomController(Cartridge cartridge) {
         Objects.requireNonNull(cartridge);
         this.cartridge = cartridge;
@@ -19,6 +33,7 @@ public final class BootRomController implements Component {
 
     /**
      * {@inheritDoc}
+     * Redirects to the boot rom if it is enabled
      */
     @Override
     public int read(int address) {
@@ -32,6 +47,7 @@ public final class BootRomController implements Component {
 
     /**
      * {@inheritDoc}
+     * Disables the boot rom if writing to the boot rom disable address
      */
     @Override
     public void write(int address, int data) {
@@ -42,4 +58,5 @@ public final class BootRomController implements Component {
         }
         cartridge.write(address, data);
     }
+
 }
