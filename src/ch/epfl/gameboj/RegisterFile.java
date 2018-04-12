@@ -14,8 +14,7 @@ import ch.epfl.gameboj.bits.Bits;
  */
 public final class RegisterFile<E extends Register> {
 
-    /** Array of registers - initial value is 0 */
-    byte[] registers;
+    private final byte[] registers;
 
     /**
      * Creates a new RegisterFile containing the values of the

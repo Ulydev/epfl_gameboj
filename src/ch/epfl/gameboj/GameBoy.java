@@ -16,17 +16,13 @@ import java.util.Objects;
  *
  * @author Ulysse Ramage (282300)
  */
-public class GameBoy {
+public final class GameBoy {
 
-    /** Bus to connect all components */
-    private Bus bus;
+    private final Bus bus;
+    private final Cpu cpu;
+    private final Timer timer;
 
-    /** Processing unit */
-    private Cpu cpu;
     private long simulatedCycles;
-
-    /** Timer */
-    private Timer timer;
 
     /**
      * Creates a new GameBoy from the given cartridge

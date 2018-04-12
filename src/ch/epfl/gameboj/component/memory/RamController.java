@@ -7,21 +7,17 @@ import java.util.Objects;
 
 /**
  * RamController
+ *
  * A Component that controls access to a ram
  *
  * @author Ulysse Ramage (282300)
  */
-public class RamController implements Component {
+public final class RamController implements Component {
 
-    /** The ram associated to the controller */
-    Ram ram;
+    private final Ram ram;
 
-    /**
-     * The data of the ram is accessible between startAddress (included)
-     * and endAddress (excluded)
-     */
-    int startAddress;
-    int endAddress;
+    private final int startAddress;
+    private final int endAddress;
 
     /**
      * Creates a new RamController with the given ram and address range
@@ -55,11 +51,6 @@ public class RamController implements Component {
         this(ram, startAddress, startAddress + ram.size());
     }
 
-    /**
-     * Checks if the given address is within the controller's bounds
-     * @param address the address to check
-     * @return true if {@code address} is within the bounds, else false
-     */
     private boolean isWithinBounds(int address) {
         return (startAddress <= address && address < endAddress);
     }

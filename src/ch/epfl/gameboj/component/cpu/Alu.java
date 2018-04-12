@@ -16,13 +16,11 @@ import java.util.Objects;
  */
 public final class Alu {
 
-    /** Flags used by the processing unit */
     public enum Flag implements Bit {
         UNUSED_0, UNUSED_1, UNUSED_2, UNUSED_3,
         C, H, N, Z
     }
 
-    /** Rotation direction */
     public enum RotDir {
         LEFT, RIGHT
     }
@@ -30,41 +28,20 @@ public final class Alu {
     /** Private constructor to prevent instancing */
     private Alu() {}
 
-    /**
-     * Packs a 16-bit value and four booleans into an integer
-     * @param v the value
-     * @param z the Z flag
-     * @param n the N flag
-     * @param h the H flag
-     * @param c the C flag
-     * @return the packed integer
-     * @throws IllegalArgumentException if {@code v} isn't 16-bit
-     */
+    /** Packs a 16-bit value and four booleans into an integer */
     private static int packValueZNHC(int v, boolean z, boolean n, boolean h, boolean c) {
         Preconditions.checkBits16(v);
         return (v << 8) + maskZNHC(z, n, h, c);
     }
 
-    /**
-     * Computes the half-carry flag of an addition
-     * @param l the first value to add
-     * @param r the second value to add
-     * @param c0 a boolean, the initial carry
-     * @return a boolean, the H flag for this operation
-     */
-    private static boolean getAddH(int l, int r, boolean c0) {
-        return (Bits.clip(4, l) + Bits.clip(4, r) + (c0 ? 1 : 0)) > 0xF;
-    }
-
-    /**
-     * Computes the carry flag of an addition
-     * @param l the first value to add
-     * @param r the second value to add
-     * @param c0 a boolean, the initial carry
-     * @return a boolean, the C flag for this operation
-     */
-    private static boolean getAddC(int l, int r, boolean c0) {
-        return (Bits.clip(8, l) + Bits.clip(8, r) + (c0 ? 1 : 0)) > 0xFF;
+    /** Checks if a packed value is correctly formatted */
+    private static void checkPackedValue(int valueFlags) {
+        Preconditions.checkArgument(
+                !Bits.test(valueFlags, Flag.UNUSED_0)
+                        && !Bits.test(valueFlags, Flag.UNUSED_1)
+                        && !Bits.test(valueFlags, Flag.UNUSED_2)
+                        && !Bits.test(valueFlags, Flag.UNUSED_3)
+        );
     }
 
     /**
@@ -82,21 +59,6 @@ public final class Alu {
         if (h) mask += Flag.H.mask();
         if (c) mask += Flag.C.mask();
         return mask;
-    }
-
-    /**
-     * Checks if a packed value is correctly formatted
-     * @param valueFlags the packed value to check
-     * @throws IllegalArgumentException if {@code valueFlags} is invalid
-     * (one of the first 4 bits is 1)
-     */
-    private static void checkPackedValue(int valueFlags) {
-        Preconditions.checkArgument(
-                !Bits.test(valueFlags, Flag.UNUSED_0)
-                && !Bits.test(valueFlags, Flag.UNUSED_1)
-                && !Bits.test(valueFlags, Flag.UNUSED_2)
-                && !Bits.test(valueFlags, Flag.UNUSED_3)
-        );
     }
 
     /**
@@ -121,6 +83,16 @@ public final class Alu {
     public static int unpackFlags(int valueFlags) {
         checkPackedValue(valueFlags);
         return Bits.extract(valueFlags, 0, 8);
+    }
+
+    /** Computes the half-carry flag of an addition */
+    private static boolean getAddH(int l, int r, boolean c0) {
+        return (Bits.clip(4, l) + Bits.clip(4, r) + (c0 ? 1 : 0)) > 0xF;
+    }
+
+    /** Computes the carry flag of an addition */
+    private static boolean getAddC(int l, int r, boolean c0) {
+        return (Bits.clip(8, l) + Bits.clip(8, r) + (c0 ? 1 : 0)) > 0xFF;
     }
 
     /**

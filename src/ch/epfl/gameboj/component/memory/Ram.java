@@ -4,14 +4,14 @@ import ch.epfl.gameboj.Preconditions;
 
 /**
  * Ram
+ *
  * A class representing a memory that can be read from and written to
  *
  * @author Ulysse Ramage (282300)
  */
-public class Ram {
+public final class Ram {
 
-    /** Array containing the ram contents */
-    private byte[] data;
+    private final byte[] data;
 
     /**
      * Creates a new ram with the specified size
@@ -21,13 +21,6 @@ public class Ram {
     public Ram(int size) {
         Preconditions.checkArgument(size >= 0);
         this.data = new byte[size];
-    }
-
-    /**
-     * @return the size of the ram
-     */
-    public int size() {
-        return this.data.length;
     }
 
     /**
@@ -51,6 +44,13 @@ public class Ram {
     public void write(int index, int value) {
         Preconditions.checkBits8(value);
         this.data[index] = (byte)value;
+    }
+
+    /**
+     * @return the size of the ram
+     */
+    public int size() {
+        return this.data.length;
     }
 
 }

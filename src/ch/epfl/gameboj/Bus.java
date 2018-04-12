@@ -14,8 +14,7 @@ import java.util.Objects;
  */
 public final class Bus {
 
-    /** List of components linked to the Bus */
-    private ArrayList<Component> attachedComponents = new ArrayList<>();
+    private final ArrayList<Component> attachedComponents = new ArrayList<>();
 
     /**
      * Attaches a component to the Bus

@@ -9,11 +9,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Cartridge
+ *
+ * A class representing a Cartridge
+ *
+ * @author Ulysse Ramage (282300)
+ */
 public final class Cartridge implements Component {
 
-    Component mbc;
+    private final Component mbc;
 
-    public static int TYPE_ADDRESS = 0x147;
+    private static final int TYPE_ADDRESS = 0x147;
 
     /**
      * Creates a new Cartridge associated with the given Memory Bank Controller
@@ -24,10 +31,12 @@ public final class Cartridge implements Component {
     }
 
     /**
-     *
-     * @param romFile
-     * @return
-     * @throws IOException
+     * Creates a new Cartridge from a given .rom file
+     * @param romFile a .rom file
+     * @return a Cartridge whose contents are those of the .rom
+     * @throws IllegalArgumentException if the .rom is invalid (cartridge type
+     * is different than 0)
+     * @throws IOException if an in/out error occurs internally
      */
     public static Cartridge ofFile(File romFile) throws IOException {
         byte[] data;
@@ -39,16 +48,23 @@ public final class Cartridge implements Component {
         return cartridge;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(int address) {
         Preconditions.checkBits16(address);
         return mbc.read(address);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(int address, int data) {
         Preconditions.checkBits16(address);
         Preconditions.checkBits8(data);
         mbc.write(address, data);
     }
+
 }

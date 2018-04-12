@@ -7,17 +7,33 @@ import ch.epfl.gameboj.component.cpu.Cpu;
 
 import java.util.Objects;
 
+/**
+ * Timer
+ *
+ * A class representing a Timer component that keeps track of
+ * the elapsed time
+ *
+ * @author Ulysse Ramage (282300)
+ */
 public final class Timer implements Component, Clocked {
 
-    private Cpu cpu;
+    private final Cpu cpu;
 
     private int counter, TIMA, TMA, TAC;
 
+    /**
+     * Creates a new Timer associated with a Cpu
+     * @param cpu the cpu associated to the timer
+     * @throws NullPointerException if {@code cpu} is null
+     */
     public Timer(Cpu cpu) {
         Objects.requireNonNull(cpu);
         this.cpu = cpu;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(int address) {
         Preconditions.checkBits16(address);
@@ -32,6 +48,9 @@ public final class Timer implements Component, Clocked {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(int address, int data) {
         Preconditions.checkBits16(address);
@@ -47,6 +66,9 @@ public final class Timer implements Component, Clocked {
         incIfChange(previousState);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void cycle(long cycle) {
         boolean previousState = state();
@@ -54,10 +76,6 @@ public final class Timer implements Component, Clocked {
         incIfChange(previousState);
     }
 
-    /**
-     *
-     * @return
-     */
     private boolean state() {
         boolean active = Bits.test(TAC, 2);
         boolean condition = Bits.test(counter, getTACIndex());
@@ -85,6 +103,5 @@ public final class Timer implements Component, Clocked {
             default: throw new IllegalArgumentException();
         }
     }
-
 
 }
