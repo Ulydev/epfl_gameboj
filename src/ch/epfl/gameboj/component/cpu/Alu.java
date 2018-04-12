@@ -34,12 +34,7 @@ public final class Alu {
         return (v << 8) + maskZNHC(z, n, h, c);
     }
 
-    /**
-     * Checks if a packed value is correctly formatted
-     * @param valueFlags the packed value to check
-     * @throws IllegalArgumentException if {@code valueFlags} is invalid
-     * (one of the first 4 bits is 1)
-     */
+    /** Checks if a packed value is correctly formatted */
     private static void checkPackedValue(int valueFlags) {
         Preconditions.checkArgument(
                 !Bits.test(valueFlags, Flag.UNUSED_0)
