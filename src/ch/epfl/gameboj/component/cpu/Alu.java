@@ -28,22 +28,6 @@ public final class Alu {
     /** Private constructor to prevent instancing */
     private Alu() {}
 
-    /** Packs a 16-bit value and four booleans into an integer */
-    private static int packValueZNHC(int v, boolean z, boolean n, boolean h, boolean c) {
-        Preconditions.checkBits16(v);
-        return (v << 8) + maskZNHC(z, n, h, c);
-    }
-
-    /** Checks if a packed value is correctly formatted */
-    private static void checkPackedValue(int valueFlags) {
-        Preconditions.checkArgument(
-                !Bits.test(valueFlags, Flag.UNUSED_0)
-                        && !Bits.test(valueFlags, Flag.UNUSED_1)
-                        && !Bits.test(valueFlags, Flag.UNUSED_2)
-                        && !Bits.test(valueFlags, Flag.UNUSED_3)
-        );
-    }
-
     /**
      * Creates a mask corresponding to the provided ZNHC flags
      * @param z the Z flag
@@ -85,16 +69,6 @@ public final class Alu {
         return Bits.extract(valueFlags, 0, 8);
     }
 
-    /** Computes the half-carry flag of an addition */
-    private static boolean getAddH(int l, int r, boolean c0) {
-        return (Bits.clip(4, l) + Bits.clip(4, r) + (c0 ? 1 : 0)) > 0xF;
-    }
-
-    /** Computes the carry flag of an addition */
-    private static boolean getAddC(int l, int r, boolean c0) {
-        return (Bits.clip(8, l) + Bits.clip(8, r) + (c0 ? 1 : 0)) > 0xFF;
-    }
-
     /**
      * Adds two 8-bit values, given an initial carry
      * @param l the first value to add
@@ -121,35 +95,6 @@ public final class Alu {
      */
     public static int add(int l, int r) {
         return add(l, r, false);
-    }
-
-    /**
-     * Adds two 16-bit values
-     * @param l the first value to add
-     * @param r the second value to add
-     * @param high whether H and C should correspond to the addition of the 8
-     * high bits (if true) or the 8 low bits (if false)
-     * @return a packed integer containing {@code l+r} and the flags 00HC
-     * @throws IllegalArgumentException if either {@code l} or {@code r} isn't 16-bit
-     */
-    private static int add16(int l, int r, boolean high) {
-        Preconditions.checkBits16(l);
-        Preconditions.checkBits16(r);
-        int result = Bits.clip(16, l + r);
-        boolean h, c;
-        if (high) {
-            int highL = Bits.extract(l, 8, 8);
-            int highR = Bits.extract(r, 8, 8);
-            boolean c0 = getAddC(l, r, false);
-            h = getAddH(highL, highR, c0);
-            c = getAddC(highL, highR, c0);
-        } else {
-            int lowL = Bits.clip(8, l);
-            int lowR = Bits.clip(8, r);
-            h = getAddH(lowL, lowR, false);
-            c = getAddC(lowL, lowR, false);
-        }
-        return packValueZNHC(result, false, false, h, c);
     }
 
     /**
@@ -368,6 +313,61 @@ public final class Alu {
         Objects.checkIndex(bitIndex, 8);
         boolean z = !Bits.test(v, bitIndex);
         return packValueZNHC(0, z, false, true, false);
+    }
+
+    /** Packs a 16-bit value and four booleans into an integer */
+    private static int packValueZNHC(int v, boolean z, boolean n, boolean h, boolean c) {
+        Preconditions.checkBits16(v);
+        return (v << 8) + maskZNHC(z, n, h, c);
+    }
+
+    /** Checks if a packed value is correctly formatted */
+    private static void checkPackedValue(int valueFlags) {
+        Preconditions.checkArgument(
+                !Bits.test(valueFlags, Flag.UNUSED_0)
+                        && !Bits.test(valueFlags, Flag.UNUSED_1)
+                        && !Bits.test(valueFlags, Flag.UNUSED_2)
+                        && !Bits.test(valueFlags, Flag.UNUSED_3)
+        );
+    }
+
+    /** Computes the half-carry flag of an addition */
+    private static boolean getAddH(int l, int r, boolean c0) {
+        return (Bits.clip(4, l) + Bits.clip(4, r) + (c0 ? 1 : 0)) > 0xF;
+    }
+
+    /** Computes the carry flag of an addition */
+    private static boolean getAddC(int l, int r, boolean c0) {
+        return (Bits.clip(8, l) + Bits.clip(8, r) + (c0 ? 1 : 0)) > 0xFF;
+    }
+
+    /**
+     * Adds two 16-bit values
+     * @param l the first value to add
+     * @param r the second value to add
+     * @param high whether H and C should correspond to the addition of the 8
+     * high bits (if true) or the 8 low bits (if false)
+     * @return a packed integer containing {@code l+r} and the flags 00HC
+     * @throws IllegalArgumentException if either {@code l} or {@code r} isn't 16-bit
+     */
+    private static int add16(int l, int r, boolean high) {
+        Preconditions.checkBits16(l);
+        Preconditions.checkBits16(r);
+        int result = Bits.clip(16, l + r);
+        boolean h, c;
+        if (high) {
+            int highL = Bits.extract(l, 8, 8);
+            int highR = Bits.extract(r, 8, 8);
+            boolean c0 = getAddC(l, r, false);
+            h = getAddH(highL, highR, c0);
+            c = getAddC(highL, highR, c0);
+        } else {
+            int lowL = Bits.clip(8, l);
+            int lowR = Bits.clip(8, r);
+            h = getAddH(lowL, lowR, false);
+            c = getAddC(lowL, lowR, false);
+        }
+        return packValueZNHC(result, false, false, h, c);
     }
 
 }
