@@ -51,10 +51,6 @@ public final class RamController implements Component {
         this(ram, startAddress, startAddress + ram.size());
     }
 
-    private boolean isWithinBounds(int address) {
-        return (startAddress <= address && address < endAddress);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -78,6 +74,10 @@ public final class RamController implements Component {
         if (isWithinBounds(address)) {
             ram.write(address - startAddress, data);
         }
+    }
+
+    private boolean isWithinBounds(int address) {
+        return (startAddress <= address && address < endAddress);
     }
 
 }

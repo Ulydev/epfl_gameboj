@@ -35,8 +35,8 @@ public final class Cpu implements Component, Clocked {
     }
     private final Reg[] regValues = Reg.values();
     private final RegisterFile<Reg> regFile = new RegisterFile<>(regValues);
-    private int PC, SP;
 
+    private int PC, SP;
     private long nextNonIdleCycle;
     private boolean alteredPC;
     private boolean conditionFailed;
@@ -53,11 +53,6 @@ public final class Cpu implements Component, Clocked {
     }
 
     private final Ram highRam = new Ram(AddressMap.HIGH_RAM_SIZE);
-
-    private boolean isWithinHighRamBounds(int address) {
-        return (AddressMap.HIGH_RAM_START <= address
-                && address < AddressMap.HIGH_RAM_END);
-    }
 
     /**
      * {@inheritDoc}
@@ -117,6 +112,43 @@ public final class Cpu implements Component, Clocked {
         IF = Bits.set(IF, i.index(), true);
     }
 
+    /**
+     * Creates an array containing the Cpu registers, for testing purposes
+     * @return an array of size 10 containing the values stored in registers
+     * PC, SP, A, F, B, C, D, E, H and L respectively
+     */
+    public int[] _testGetPcSpAFBCDEHL() {
+        return new int[] {
+                PC,
+                SP,
+                reg(Reg.A),
+                reg(Reg.F),
+                reg(Reg.B),
+                reg(Reg.C),
+                reg(Reg.D),
+                reg(Reg.E),
+                reg(Reg.H),
+                reg(Reg.L)
+        };
+    }
+
+    /** Creates an array of opcodes indexed by their encoding, given a kind */
+    private static Opcode[] buildOpcodeTable(Opcode.Kind kind) {
+        Opcode[] opcodeTable = new Opcode[0x100];
+        for (Opcode o: Opcode.values()) {
+            if (o.kind.equals(kind)) {
+                opcodeTable[o.encoding] = o;
+            }
+        }
+        return opcodeTable;
+    }
+
+    private boolean isWithinHighRamBounds(int address) {
+        return (AddressMap.HIGH_RAM_START <= address
+                && address < AddressMap.HIGH_RAM_END);
+    }
+
+    /** Simulates a cycle */
     private void reallyCycle(long cycle) {
         Interrupt interrupt = getCurrentInterrupt();
         if (IME && interrupt != null) {
@@ -570,37 +602,6 @@ public final class Cpu implements Component, Clocked {
             throw new Error("STOP is not implemented");
 
         }
-    }
-
-    /** Creates an array of opcodes indexed by their encoding, given a kind */
-    private static Opcode[] buildOpcodeTable(Opcode.Kind kind) {
-        Opcode[] opcodeTable = new Opcode[0x100];
-        for (Opcode o: Opcode.values()) {
-            if (o.kind.equals(kind)) {
-                opcodeTable[o.encoding] = o;
-            }
-        }
-        return opcodeTable;
-    }
-
-    /**
-     * Creates an array containing the Cpu registers, for testing purposes
-     * @return an array of size 10 containing the values stored in registers
-     * PC, SP, A, F, B, C, D, E, H and L respectively
-     */
-    public int[] _testGetPcSpAFBCDEHL() {
-        return new int[] {
-                PC,
-                SP,
-                reg(Reg.A),
-                reg(Reg.F),
-                reg(Reg.B),
-                reg(Reg.C),
-                reg(Reg.D),
-                reg(Reg.E),
-                reg(Reg.H),
-                reg(Reg.L)
-        };
     }
 
     private int clip16(int v) {
