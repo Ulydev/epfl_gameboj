@@ -3,6 +3,7 @@ package ch.epfl.gameboj;
 import ch.epfl.gameboj.component.Timer;
 import ch.epfl.gameboj.component.cartridge.Cartridge;
 import ch.epfl.gameboj.component.cpu.Cpu;
+import ch.epfl.gameboj.component.lcd.LcdController;
 import ch.epfl.gameboj.component.memory.BootRomController;
 import ch.epfl.gameboj.component.memory.Ram;
 import ch.epfl.gameboj.component.memory.RamController;
@@ -21,6 +22,7 @@ public final class GameBoy {
     private final Bus bus;
     private final Cpu cpu;
     private final Timer timer;
+    private final LcdController lcdController;
 
     private long simulatedCycles;
 
@@ -58,6 +60,10 @@ public final class GameBoy {
         // Timer
         timer = new Timer(cpu);
         timer.attachTo(bus);
+
+        // Lcd Controller
+        lcdController = new LcdController(cpu);
+        lcdController.attachTo(bus);
     }
 
     /**
@@ -82,6 +88,13 @@ public final class GameBoy {
     }
 
     /**
+     * @return the GameBoy lcd controller
+     */
+    public LcdController lcdController() {
+        return lcdController;
+    }
+
+    /**
      * Runs the processor until a given cycle is reached
      * @param cycle the cycle limit
      */
@@ -89,6 +102,7 @@ public final class GameBoy {
         Preconditions.checkArgument(simulatedCycles <= cycle);
         while (simulatedCycles < cycle) {
             timer.cycle(simulatedCycles);
+            lcdController.cycle(simulatedCycles);
             cpu.cycle(simulatedCycles);
             simulatedCycles++;
         }

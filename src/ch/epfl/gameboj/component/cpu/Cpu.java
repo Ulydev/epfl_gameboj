@@ -64,9 +64,8 @@ public final class Cpu implements Component, Clocked {
         if (address == AddressMap.REG_IF) return IF;
         if (isWithinHighRamBounds(address)) {
             return highRam.read(address - AddressMap.HIGH_RAM_START);
-        } else {
-            return Component.NO_DATA;
         }
+        return Component.NO_DATA;
     }
 
     /**

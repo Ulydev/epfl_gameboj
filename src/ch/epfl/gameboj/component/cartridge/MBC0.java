@@ -38,9 +38,8 @@ public final class MBC0 implements Component {
         Preconditions.checkBits16(address);
         if (0 <= address && address < rom.size()) {
             return rom.read(address);
-        } else {
-            return Component.NO_DATA;
         }
+        return Component.NO_DATA;
     }
 
     /** Does not do anything, as writing to a Rom is not supported */

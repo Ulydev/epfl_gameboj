@@ -59,9 +59,8 @@ public final class RamController implements Component {
         Preconditions.checkBits16(address);
         if (isWithinBounds(address)) {
             return ram.read(address - startAddress);
-        } else {
-            return Component.NO_DATA;
         }
+        return Component.NO_DATA;
     }
 
     /**

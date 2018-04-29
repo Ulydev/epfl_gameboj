@@ -41,8 +41,10 @@ public final class Bits {
     /**
      * The index is obtained from the given Bit
      * @see #test(int, int)
+     * @throws NullPointerException if {@code bit} is null
      */
     public static boolean test(int bits, Bit bit) {
+        Objects.requireNonNull(bit);
         return test(bits, bit.index());
     }
 
@@ -61,6 +63,16 @@ public final class Bits {
         } else {
             return bits & ~mask(index);
         }
+    }
+
+    /**
+     * The index is obtained from the given Bit
+     * @see #set(int, int, boolean)
+     * @throws NullPointerException if {@code bit} is null
+     */
+    public static int set(int bits, Bit bit, boolean newValue) {
+        Objects.requireNonNull(bit);
+        return set(bits, bit.index(), newValue);
     }
 
     /**
